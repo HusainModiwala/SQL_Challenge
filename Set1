@@ -1,0 +1,109 @@
+create database test;
+use test;
+create table city(
+    id int,
+    name varchar(17), 
+    country_code varchar(3), 
+    district varchar(20), 
+    population int
+);
+insert into city values(6, 'Rotterdam', 'NLD', 'Zuid-Holland', 593321),
+(3878, 'Scottsdale', 'USA', 'Arizona', 202705),
+(3965, 'Corona', 'USA', 'California', 124966),
+(3973, 'Concord', 'USA', 'California', 121780),
+(3982, 'Coral Springs', 'USA', 'Florida', 117549),
+(4054, 'Fairfield', 'USA', 'California', 92256),
+(4058, 'Boulder', 'USA', 'Colorado', 91238),
+(4061, 'Fall River', 'USA', 'Massachusetts', 90555);
+
+#query 1
+select * from city where country_code='USA' and population>100000;
+
+#query 2
+select * from city where country_code='USA' and population>120000;
+
+#query 3
+select * from city;
+
+#query 4
+select * from city where id=1661;
+
+#query 5
+select * from city where country_code='JPN';
+
+#query 6
+select name from city where country_code='JPN';
+
+
+create table station(
+    id int,
+    city varchar(21), 
+    state varchar(2), 
+    lat_n int, 
+    lon_w int
+);
+insert into station values
+(794, 'Kissee Mills', 'MO', 139, 73),
+(824, 'Loma Mar', 'CA', 48, 130),
+(603, 'Sandy Hook', 'CT', 72, 148),
+(478, 'Tipton', 'IN', 33, 97),
+(619, 'Arlington', 'CO', 75, 92),
+(711, 'Turner', 'AR', 50, 101),
+(839, 'Slidell', 'LA', 85, 151),
+(411, 'Negreet', 'LA', 98, 105),
+(588, 'Glencoe', 'KY', 46, 136),
+(665, 'Chelsea', 'IA', 98, 59),
+(342, 'Chignik Lagoon', 'AK', 103, 153),
+(733, 'Pelahatchie', 'MS', 38, 28),
+(441, 'Hanna City', 'IL', 50, 136),
+(811, 'Dorrance', 'KS', 102, 121),
+(698, 'Albany', 'CA', 49, 80),
+(325, 'Monument', 'KS', 70, 141),
+(414, 'Manchester', 'MD', 73, 37),
+(113, 'Prescott', 'IA', 39, 65),
+(971, 'Graettinger', 'IA', 94, 150),
+(266, 'Cahone', 'CO', 116, 127);
+
+#query 7
+select city, state from station;
+
+#query 8
+select distinct(city) from station where id%2=0;
+
+#query 9
+select count(*)-count(distinct(city)) from station;
+
+#query 10
+#part1 (max city len)
+select city as max_len_city 
+    from station 
+    where length(city)=(select max(length(city)) from station) 
+order by city limit 1;
+
+#part2 (min city len)
+select city as min_len_city 
+    from station 
+    where length(city)=(select min(length(city)) from station) 
+order by city limit 1;
+
+#query 11
+select distinct(city) from station where REGEXP_LIKE(city,'^[aeiou]');
+
+#query 12
+select distinct(city) from station where REGEXP_LIKE(city,'[aeiou]$');
+
+#query 13
+select distinct(city) from station where !REGEXP_LIKE(city,'^[aeiou]');
+
+#query 14
+select distinct(city) from station where !REGEXP_LIKE(city,'[aeiou]$');
+
+#query 15
+select distinct(city) 
+from station 
+where !REGEXP_LIKE(city,'^[aeiou]') or !REGEXP_LIKE(city,'[aeiou]$');
+
+#query 16
+select distinct(city) 
+from station 
+where !REGEXP_LIKE(city,'^[aeiou]') and !REGEXP_LIKE(city,'[aeiou]$');
