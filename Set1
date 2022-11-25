@@ -107,3 +107,119 @@ where !REGEXP_LIKE(city,'^[aeiou]') or !REGEXP_LIKE(city,'[aeiou]$');
 select distinct(city) 
 from station 
 where !REGEXP_LIKE(city,'^[aeiou]') and !REGEXP_LIKE(city,'[aeiou]$');
+
+
+create table products(product_id int,
+product_name varchar(30),
+unit_price int,
+constraint pk_product primary key(product_id)
+);
+insert into products values
+(1, 'S8', 1000),
+(2, 'G4', 800),
+(3, 'iPhone', 1400);
+
+create table sales(seller_id int,
+product_id int,
+buyer_id int,
+sale_date date,
+quantity int,
+price int,
+constraint fk_product_sale foreign key(product_id)
+references products(product_id)
+);
+insert into sales values
+(1, 1, 1, '2019-01-21', 2, 2000),
+(1, 2, 2, '2019-02-17', 1, 800),
+(2, 2, 3, '2019-06-02', 1, 800),
+(3, 3, 4, '2019-05-13', 2, 2800);
+
+#query 17
+select tmp.product_id,
+       tmp.product_name
+from
+    (
+        SELECT s.product_id, 
+               p.product_name,
+               s.sale_date,
+               rank() over(partition by s.product_id order by s.sale_date desc) as most_recent_sale
+        from
+        sales s
+        JOIN
+        products p
+        on(s.product_id = p.product_id)
+    ) tmp
+where tmp.most_recent_sale = 1 and tmp.sale_date >= '2019-01-01' and tmp.sale_date <= '2019-03-31';
+
+create table views(article_id int,
+author_id int,
+viewer_id int,
+view_date date
+);
+insert into views values(1, 3, 5, '2019-08-01'),
+(1, 3, 6, '2019-08-02'),
+(2, 7, 7, '2019-08-01'),
+(2, 7, 6, '2019-08-02'),
+(4, 7, 1, '2019-07-22'),
+(3, 4, 4, '2019-07-21'),
+(3, 4, 4, '2019-07-21');
+
+#query 18
+select distinct(author_id) as id 
+from views 
+where author_id = viewer_id
+order by id;
+
+create table delivery(delivery_id int,
+customer_id int,
+order_date date,
+customer_pref_delivery_date date,
+constraint pk_delivery primary key(delivery_id)
+);
+insert into delivery values(1, 1, '2019-08-01', '2019-08-02'),
+(2, 5, '2019-08-02', '2019-08-02'),
+(3, 1, '2019-08-11', '2019-08-11'),
+(4, 3, '2019-08-24', '2019-08-26'),
+(5, 4, '2019-08-21', '2019-08-22'),
+(6,AVG() 2, '2019-08-11', '2019-08-13');
+
+#query 19
+select 
+round(
+        (sum(case when order_date = customer_pref_delivery_date then 1 else 0 end) / count(*) * 100),
+        2
+    ) 
+    as immediate_percentage 
+from delivery;
+
+create table ads(
+ad_id int,
+user_id int,
+action varchar(25),
+constraint pk_ads primary key(ad_id, user_id)
+);
+insert into ads VALUES(1, 1, 'Clicked'),
+(2, 2, 'Clicked'),
+(3, 3, 'Viewed'),
+(5, 5, 'Ignored'),
+(1, 7, 'Ignored'),
+(2, 7, 'Viewed'),
+(3, 5, 'Clicked'),
+(1, 4, 'Viewed'),
+(2, 11, 'Viewed'),
+(1, 2, 'Clicked');
+
+#query 20
+with cte as
+(select ad_id,
+sum(case when action = 'Clicked' then 1 else 0 end) as clicked,
+sum(case when action = 'Viewed' then 1 else 0 end) as viewed
+from ads
+group by ad_id)
+
+select ad_id, 
+case 
+when ((clicked + viewed) > 0) then 
+    round(((clicked) / (clicked + viewed) * 100), 2) 
+    else 0.00 end as ctr
+from cte;
