@@ -223,3 +223,82 @@ when ((clicked + viewed) > 0) then
     round(((clicked) / (clicked + viewed) * 100), 2) 
     else 0.00 end as ctr
 from cte;
+
+create table employee(employee_id int,
+team_id INT,
+constraint pk_employee PRIMARY key(employee_id));
+insert into employee values
+(1, 8),
+(2, 8),
+(3, 8),
+(4, 7),
+(5, 9),
+(6, 9);
+
+#query 21
+with cte as
+(select team_id, count(*) as team_size
+from employee
+group by team_id)
+
+select e.employee_id, c.team_size
+from
+employee e
+join
+cte c
+on (e.team_id = c.team_id);
+
+create table countries(country_id int,
+country_name varchar(20),
+constraint pk_countries PRIMARY key(country_id));
+insert into countries values
+(2, 'USA'),
+(3, 'Australia'),
+(7, 'Peru'),
+(5, 'China'),
+(8, 'Morocco'),
+(9, 'Spain');
+
+create table weather(country_id int,
+weather_state int,
+day date,
+constraint pk_weather PRIMARY key(country_id, day));
+insert into weather values
+(2, 15, '2019-11-01'),
+(2, 12, '2019-10-28'),
+(2, 12, '2019-10-27'),
+(3, -2, '2019-11-10'),
+(3, 0, '2019-11-11'),
+(3, 3, '2019-11-12'),
+(5, 16, '2019-11-07'),
+(5, 18, '2019-11-09'),
+(5, 21, '2019-11-23'),
+(7, 25, '2019-11-28'),
+(7, 22, '2019-12-01'),
+(7, 20, '2019-12-02'),
+(8, 25, '2019-11-05'),
+(8, 27, '2019-11-15'),
+(8, 31, '2019-11-25'),
+(9, 7, '2019-10-23'),
+(9, 3, '2019-12-23');
+
+#query 22
+with cte
+as
+(select country_id,
+       round(avg(weather_state), 3) as avg_temp,
+       CASE
+       when avg(weather_state) <= 15 then 'Cold'
+       when avg(weather_state) >=25 then 'Hot'
+       else 'Warm'
+       end as weather_type 
+from weather
+where day between '2019-11-01' and '2019-11-30'
+group by country_id)
+
+select con.country_name,
+       c.weather_type, 
+       avg_temp
+from countries con 
+join cte c 
+on (con.country_id = c.country_id);
