@@ -372,3 +372,49 @@ from activity)
 select cte.player_id, cte.device_id
 from cte
 where cte.rk = 1;
+
+create table products(product_id int,
+product_name varchar(25),
+product_category varchar(25),
+constraint pk_products primary key(product_id)
+);
+
+create table orders(product_id int,
+order_date date,
+unit int,
+constraint fk_orders foreign key(product_id) 
+references products(product_id)
+);
+
+insert into products values
+(1, 'Leetcode Solutions', 'Book'),
+(2, 'Jewels Of Stringology', 'Book'),
+(3, 'HP', 'Laptop'),
+(4, 'Lenovo', 'Laptop'),
+(5, 'Leetcode Kit', 'T-shirt');
+
+insert into orders values
+(1, '2020-02-05', 60),
+(1, '2020-02-10', 70),
+(2, '2020-01-18', 30),
+(2, '2020-02-11', 80),
+(3, '2020-02-17', 2),
+(3, '2020-02-24', 3),
+(4, '2020-03-01', 20),
+(4, '2020-03-04', 30),
+(4, '2020-03-04', 60),
+(5, '2020-02-25', 50),
+(5, '2020-02-27', 50),
+(5, '2020-03-01', 50);
+
+#query 26
+select p.product_name, 
+       sum(o.unit) as unit
+from
+products p 
+join 
+orders o 
+on(p.product_id = o.product_id)
+where o.order_date between '2020-02-01' and '2020-02-29'
+group by p.product_id
+having unit >= 100;
