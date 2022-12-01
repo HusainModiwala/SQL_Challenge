@@ -418,3 +418,20 @@ on(p.product_id = o.product_id)
 where o.order_date between '2020-02-01' and '2020-02-29'
 group by p.product_id
 having unit >= 100;
+
+create table users(user_id int,
+name varchar(30),
+email varchar(30),
+constraint pk_users primary key(user_id)
+);
+insert into users values
+(1, 'Winston', 'winston@leetcode.com'),
+(2, 'Jonathan', 'jonathanisgreat'),
+(3, 'Annabelle', 'bella-@leetcode.com'),
+(4, 'Sally', 'sally.come@leetcode.com'),
+(5, 'Marwan', 'quarz#2020@leetcode.com'),
+(6, 'David', 'david69@gmail.com'),
+(7, 'Shapiro', '.shapo@leetcode.com');
+
+#query 27
+select * from users where REGEXP_LIKE(email,'^[a-zA-Z][a-zA-Z0-9_.-]*@leetcode[.]com');
