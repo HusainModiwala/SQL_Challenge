@@ -135,21 +135,19 @@ insert into sales values
 (3, 3, 4, '2019-05-13', 2, 2800);
 
 #query 17
-select tmp.product_id,
-       tmp.product_name
+with cte as
+(select product_id 
+from sales
+where sale_date > '2019-03-31'
+or sale_date < '2019-01-01')
+
+select distinct s.product_id, p.product_name
 from
-    (
-        SELECT s.product_id, 
-               p.product_name,
-               s.sale_date,
-               rank() over(partition by s.product_id order by s.sale_date desc) as most_recent_sale
-        from
-        sales s
-        JOIN
-        products p
-        on(s.product_id = p.product_id)
-    ) tmp
-where tmp.most_recent_sale = 1 and tmp.sale_date >= '2019-01-01' and tmp.sale_date <= '2019-03-31';
+sales s
+join
+product p
+on(s.product_id = p.product_id)
+where s.product_id not in (select * from cte);
 
 create table views(article_id int,
 author_id int,
